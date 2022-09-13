@@ -2,7 +2,7 @@
     let totalSeconds = 0;
     let interval;
 
-    let mins = 0;
+    export let mins = 0;
     let sec = 0;
 
     let isCounting = true
@@ -24,12 +24,12 @@
         },1000)
     }
 
-    function padTo2Digits(num) {
+    function formatMinutes(num) {
         return num.toString().padStart(2, '0');
     }
 
 </script>
 
 <div>
-    <h1>{padTo2Digits(mins)} : {padTo2Digits(sec)}</h1>
+    <h1>{formatMinutes(mins)} : {formatMinutes(sec)}</h1>
 </div>

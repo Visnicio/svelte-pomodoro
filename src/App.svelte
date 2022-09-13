@@ -4,10 +4,12 @@
 
   import Timer from './lib/Timer.svelte'
   let timer;
+
+  let time = 25;
 </script>
 
 <main>
-  <Timer bind:this={timer}/>
+  <Timer bind:this={timer} mins={25}/>
 
   <button on:click={()=>timer.pomodoro(2)}>Start Timer</button>
 
