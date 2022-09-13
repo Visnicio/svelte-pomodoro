@@ -9,7 +9,7 @@
 <main>
   <Timer bind:this={timer}/>
 
-  <button on:click={()=>timer.pomodoro(1)}>Start Timer</button>
+  <button on:click={()=>timer.pomodoro(2)}>Start Timer</button>
 
   <h1>Vite + Svelte</h1>
 
