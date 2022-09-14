@@ -6,18 +6,24 @@
   let timer;
 
   let time = 25;
+
+  let isCounting;
 </script>
 
 <main>
-  <Timer bind:this={timer} mins={25}/>
+  <Timer bind:this={timer} mins={time} bind:isCounting/>
 
-  <button on:click={()=>timer.pomodoro(2)}>Start Timer</button>
+  {#if isCounting===false}
+    <button on:click={()=>timer.pomodoro(time)}>Start Pomodoro</button>
+  {/if}
+  {#if isCounting===true}
+    <button on:click={()=>timer.reset(time)}>Reset</button>
+  {/if}
+  <button on:click={()=>{time = 25}}>25 Minutes</button>
+  <button on:click={()=>{time = 5}}>5 Minutes</button>
+  <button on:click={()=>{time = 15}}>15 Minutes</button>
 
-  <h1>Vite + Svelte</h1>
-
-  <div class="card">
-    <Counter />
-  </div>
+  <h4>binding isCounting {isCounting}</h4>
 
 </main>
 

@@ -5,11 +5,13 @@
     export let mins = 0;
     let sec = 0;
 
-    let isCounting = true
+    export let isCounting = false;
 
     export function pomodoro(totalMins){
-        
+        isCounting = true;
+
         totalSeconds = totalMins*60 || 0; // set the minutes in seconds format
+        
         interval = setInterval(()=>{
             totalSeconds --;
 
@@ -20,8 +22,17 @@
                 clearInterval(interval);
 
                 alert("End of time");
+                isCounting = false;
             }
         },1000)
+    }
+
+    export function pausePomodoro(){
+        isCounting = false;
+    }
+    export function reset(){
+        clearInterval(interval);
+        isCounting = false;
     }
 
     function formatMinutes(num) {
