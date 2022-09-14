@@ -1,5 +1,5 @@
 <script>
-    let totalSeconds = 0;
+    let totalSeconds;
     let interval;
 
     export let mins = 0;
@@ -8,23 +8,29 @@
     export let isCounting = false;
 
     export function pomodoro(totalMins){
-        isCounting = true;
-
+        
         totalSeconds = totalMins*60 || 0; // set the minutes in seconds format
         
-        interval = setInterval(()=>{
-            totalSeconds --;
+        isCounting = true;
 
-            mins = Math.floor(totalSeconds/60);
-            sec = totalSeconds % 60;
+        // interval = setInterval(()=>{
 
-            if(!totalSeconds){
-                clearInterval(interval);
+        //     if(isCounting){
+        //         totalSeconds --;
 
-                alert("End of time");
-                isCounting = false;
-            }
-        },1000)
+        //         mins = Math.floor(totalSeconds/60);
+        //         sec = totalSeconds % 60;
+
+        //         if(!totalSeconds){
+        //             clearInterval(interval);
+
+        //             isCounting = false;
+
+        //             let sound = new Audio("../assets/sounds/clock.mp3");
+        //             sound.play();
+        //         }
+        //     }
+        // },1000)
     }
 
     export function pausePomodoro(){
@@ -32,12 +38,38 @@
     }
     export function reset(){
         clearInterval(interval);
+        
         isCounting = false;
+    }
+
+    export function startPomodoro(totalMins){
+        totalSeconds = totalMins*60 || 0; // set the minutes in seconds format
+        
+        isCounting = true;
     }
 
     function formatMinutes(num) {
         return num.toString().padStart(2, '0');
     }
+
+    interval = setInterval(()=>{
+
+        if(isCounting){
+            totalSeconds --;
+    
+            mins = Math.floor(totalSeconds/60);
+            sec = totalSeconds % 60;
+    
+            if(!totalSeconds){
+                clearInterval(interval);
+    
+                isCounting = false;
+    
+                let sound = new Audio("../assets/sounds/clock.mp3");
+                sound.play();
+            }
+        }
+    },1000)
 
 </script>
 

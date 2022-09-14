@@ -5,25 +5,28 @@
   import Timer from './lib/Timer.svelte'
   let timer;
 
-  let time = 25;
-
   let isCounting;
+  let mins;
 </script>
 
 <main>
-  <Timer bind:this={timer} mins={time} bind:isCounting/>
+  <Timer bind:this={timer} bind:mins bind:isCounting/>
 
   {#if isCounting===false}
-    <button on:click={()=>timer.pomodoro(time)}>Start Pomodoro</button>
+    <button on:click={()=>timer.startPomodoro(mins)}>Start Pomodoro</button>
   {/if}
   {#if isCounting===true}
-    <button on:click={()=>timer.reset(time)}>Reset</button>
+    <button on:click={()=>timer.pausePomodoro(mins)}>Pause</button>
   {/if}
-  <button on:click={()=>{time = 25}}>25 Minutes</button>
-  <button on:click={()=>{time = 5}}>5 Minutes</button>
-  <button on:click={()=>{time = 15}}>15 Minutes</button>
+  {#if isCounting===true}
+    <button on:click={()=>timer.pausePomodoro()}>Resume</button>
+  {/if}
+  <button on:click={()=>{mins = 25}}>25 Minutes</button>
+  <button on:click={()=>{mins = 5}}>5 Minutes</button>
+  <button on:click={()=>{mins = 15}}>15 Minutes</button>
 
   <h4>binding isCounting {isCounting}</h4>
+  <h4>binding mins {mins}</h4>
 
 </main>
 
