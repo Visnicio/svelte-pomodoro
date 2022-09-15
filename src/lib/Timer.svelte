@@ -1,7 +1,6 @@
 <script>
     
     export let timeInSeconds = 300;
-    export let isCounting = false;
 
 
     let minutes;
@@ -14,20 +13,24 @@
         minutes = Math.floor(timeInSeconds/60);
     }
 
-
-    pomodoro = setInterval( ()=>{
-        if(isCounting){
+    export function start(){
+        pomodoro = setInterval( ()=>{
             if(timeInSeconds > 0){
                 timeInSeconds --;
             }else{
-                // if (Notification.permission === "granted") {
-                //     const notification = new Notification("Hi there!");
-                // }
-                // clearInterval(pomodoro);
+                if (Notification.permission === "granted") {
+                    const notification = new Notification("The time has ended");
+                }
+                clearInterval(pomodoro);
             }
-        }
-        
-    },1000)
+            
+        },1000)
+    }
+
+    export function stop(){
+        clearInterval(pomodoro);
+    }
+
     
     if(seconds == 0){
         console.log("acabou");

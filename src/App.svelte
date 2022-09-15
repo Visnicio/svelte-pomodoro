@@ -1,5 +1,6 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
+  import { start_hydrating } from 'svelte/internal';
+import svelteLogo from './assets/svelte.svg'
   import Counter from './lib/Counter.svelte'
 
   import Navbar from './lib/Navbar.svelte'
@@ -29,11 +30,11 @@
     <button on:click={()=>{timeInSeconds=900}}>15 Minutes</button>
   </div>
   
-  <Timer bind:this={timer} bind:isCounting bind:timeInSeconds/>
+  <Timer bind:this={timer} bind:timeInSeconds/>
   
   <div>
-    <button on:click={()=>{isCounting=true}}>Start/Resume</button>
-    <button on:click={()=>{isCounting=false}}>Stop</button>
+    <button on:click={()=> timer.start() }>Start/Resume</button>
+    <button on:click={()=> timer.stop() }>Stop</button>
   </div>
 
 </main>
