@@ -2,6 +2,8 @@
   import svelteLogo from './assets/svelte.svg'
   import Counter from './lib/Counter.svelte'
 
+  import Navbar from './lib/Navbar.svelte'
+
   import Timer from './lib/Timer.svelte'
   let timer;
 
@@ -10,14 +12,19 @@
 
 </script>
 
-<main>
-  <button on:click={()=>{isCounting=true}}>Start/Resume</button>
-  <button on:click={()=>{isCounting=false}}>Stop</button>
-
+<Navbar/>
+<main class="p-8 grid gap-4 justify-center text-center mt-32">
+  <div>
+    <button on:click={()=>{timeInSeconds=1500}}>25 Minutes</button>
+    <button on:click={()=>{timeInSeconds=300}}>5 Minutes</button>
+    <button on:click={()=>{timeInSeconds=900}}>15 Minutes</button>
+  </div>
+  
   <Timer bind:this={timer} bind:isCounting bind:timeInSeconds/>
-
-  <button on:click={()=>{timeInSeconds=1500}}>25 Minutes</button>
-  <button on:click={()=>{timeInSeconds=300}}>5 Minutes</button>
-  <button on:click={()=>{timeInSeconds=900}}>15 Minutes</button>
+  
+  <div>
+    <button on:click={()=>{isCounting=true}}>Start/Resume</button>
+    <button on:click={()=>{isCounting=false}}>Stop</button>
+  </div>
 
 </main>
