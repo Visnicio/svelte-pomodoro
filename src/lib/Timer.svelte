@@ -31,11 +31,6 @@
         clearInterval(pomodoro);
     }
 
-    
-    if(seconds == 0){
-        console.log("acabou");
-    }
-    
 </script>
 
 <div class="my-10 ">

@@ -8,13 +8,12 @@ import svelteLogo from './assets/svelte.svg'
   import Timer from './lib/Timer.svelte'
   let timer;
 
-  let isCounting;
   let timeInSeconds;
 
   window.onload = function(){
 
     if (Notification.permission !== "denied") {
-    // We need to ask the user for permission
+      // We need to ask the user for permission
       Notification.requestPermission()
     }
 
@@ -26,7 +25,7 @@ import svelteLogo from './assets/svelte.svg'
 <main class="p-8 grid gap-4 justify-center text-center mt-32">
   <div>
     <button on:click={()=>{timeInSeconds=1500}}>25 Minutes</button>
-    <button on:click={()=>{timeInSeconds=5}}>5 Minutes</button>
+    <button on:click={()=>{timeInSeconds=300}}>5 Minutes</button>
     <button on:click={()=>{timeInSeconds=900}}>15 Minutes</button>
   </div>
   
