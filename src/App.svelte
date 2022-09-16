@@ -1,48 +1,57 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
+  import { start_hydrating } from 'svelte/internal';
+import svelteLogo from './assets/svelte.svg'
   import Counter from './lib/Counter.svelte'
+
+  import Navbar from './lib/Navbar.svelte'
 
   import Timer from './lib/Timer.svelte'
   let timer;
 
-  let isCounting;
-  let mins;
+  let timeInSeconds;
+
+  window.onload = function(){
+
+    if (Notification.permission !== "denied") {
+      // We need to ask the user for permission
+      Notification.requestPermission()
+    }
+
+  }
+
+  function addTask(){
+    let task = document.querySelector("#newTask").value;
+    localStorage.setItem("tasks", JSON.stringify(task)); 
+  }
+
 </script>
 
-<main>
-  <Timer bind:this={timer} bind:mins bind:isCounting/>
+<Navbar/>
+<main class="p-8 grid gap-4 justify-center text-center mt-32">
+  <div>
+    <button on:click={()=>{timeInSeconds=1500}}>25 Minutes</button>
+    <button on:click={()=>{timeInSeconds=300}}>5 Minutes</button>
+    <button on:click={()=>{timeInSeconds=900}}>15 Minutes</button>
+  </div>
+  
+  <Timer bind:this={timer} bind:timeInSeconds/>
+  
+  <div>
+    <button on:click={()=> timer.start() }>Start/Resume</button>
+    <button on:click={()=> timer.stop() }>Stop</button>
+  </div>
 
-  {#if isCounting===false}
-    <button on:click={()=>timer.startPomodoro(mins)}>Start Pomodoro</button>
-  {/if}
-  {#if isCounting===true}
-    <button on:click={()=>timer.pausePomodoro(mins)}>Pause</button>
-  {/if}
-  {#if isCounting===true}
-    <button on:click={()=>timer.pausePomodoro()}>Resume</button>
-  {/if}
-  <button on:click={()=>{mins = 25}}>25 Minutes</button>
-  <button on:click={()=>{mins = 5}}>5 Minutes</button>
-  <button on:click={()=>{mins = 15}}>15 Minutes</button>
+  <hr>
 
-  <h4>binding isCounting {isCounting}</h4>
-  <h4>binding mins {mins}</h4>
+  <div>
+    <h1>Your Tasks</h1>
+    <div id="tasks">
+
+    </div>
+    <div>
+      <input type="text" name="newTask" id="newTask" class="px-2 py-2 rounded-lg">
+      <button on:click={()=>addTask()}>Add Task</button>
+    </div>
+  </div>
 
 </main>
-
-<style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
-</style>
