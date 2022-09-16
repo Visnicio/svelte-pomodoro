@@ -19,6 +19,11 @@ import svelteLogo from './assets/svelte.svg'
 
   }
 
+  function addTask(){
+    let task = document.querySelector("#newTask").value;
+    localStorage.setItem("tasks", JSON.stringify(task)); 
+  }
+
 </script>
 
 <Navbar/>
@@ -34,6 +39,19 @@ import svelteLogo from './assets/svelte.svg'
   <div>
     <button on:click={()=> timer.start() }>Start/Resume</button>
     <button on:click={()=> timer.stop() }>Stop</button>
+  </div>
+
+  <hr>
+
+  <div>
+    <h1>Your Tasks</h1>
+    <div id="tasks">
+
+    </div>
+    <div>
+      <input type="text" name="newTask" id="newTask" class="px-2 py-2 rounded-lg">
+      <button on:click={()=>addTask()}>Add Task</button>
+    </div>
   </div>
 
 </main>
