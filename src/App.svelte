@@ -1,10 +1,11 @@
 <script>
+
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "firebase/app";
   import { getAnalytics } from "firebase/analytics";
   // TODO Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
-  import { getFirestore, collection, addDoc, setDoc, getDoc, doc } from "firebase/firestore";
+  import { getFirestore, collection, addDoc, setDoc, getDoc, doc, updateDoc, arrayUnion, query, where, onSnapshot } from "firebase/firestore";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
 
  
@@ -24,25 +25,8 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
-
   const db = getFirestore(app);
-
   const auth = getAuth();
-
-  //trying to store something
-  async function addUser(uid, displayName){
-    try{
-      await setDoc(doc(db, "user", uid), {
-        username: displayName
-      });
-    } catch (err){
-      console.log(err);
-    }
-  }
-
-  import { start_hydrating } from 'svelte/internal';
-  import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/Counter.svelte'
 
   import Navbar from './lib/Navbar.svelte'
 
@@ -54,11 +38,9 @@
   window.onload = function(){
 
     if (Notification.permission !== "denied") {
-      // We need to ask the user for permission
       Notification.requestPermission()
     }
 
-    // addTemplate();
   }
 
   function signIn(){
@@ -71,15 +53,14 @@
       const token = credential.accessToken;
       // The signed-in user info.
       const user = result.user;
-      console.log(user);
+
+      const userRef = doc(db, "user", user.uid); //select a document with the user id
+      checkUser(userRef, user);
 
     }).catch((error) => {
-      // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
-      // The email of the user's account used.
       const email = error.customData.email;
-      // The AuthCredential type that was used.
       const credential = GoogleAuthProvider.credentialFromError(error);
     });
   }
@@ -87,15 +68,13 @@
   async function checkUser(userRef, userObj){
     const docSnap = await getDoc(userRef);
 
-      if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-
-        //como nao existe aqui eu nao consigo passar o id
-        addUser(userObj.uid, userObj.displayName);
-      }
+    if (docSnap.exists()) {
+      console.log("Document data:", docSnap.data());
+    } else {
+      await setDoc(doc(db, "user", userObj.uid), {
+        username: userObj.displayName
+      });
+    }
   }
 
   onAuthStateChanged(auth, user =>{
@@ -103,9 +82,12 @@
       document.getElementById("signedIn").hidden = false;
       document.getElementById("signedOut").hidden = true;
 
-      const userRef = doc(db, "user", user.uid); //select a document with the user id
-      checkUser(userRef, user);
-      
+      const userRef = doc(db, "user", user.uid);
+
+      const unsub = onSnapshot(userRef, (doc) => {
+        console.log("Current tasks: ", doc.data().tasks);
+      });
+
     }else{
       document.getElementById("signedIn").hidden = true;
       document.getElementById("signedOut").hidden = false;
@@ -117,9 +99,9 @@
 
     const user = auth.currentUser;
     if(user !== null){
-      await setDoc(doc(db, "user", user.uid), {
-        username: user.displayName,
-        tasks: task
+      const userRef = doc(db, "user", user.uid);
+      await updateDoc(userRef, {
+          tasks: arrayUnion(task)
       });
     }
   }
