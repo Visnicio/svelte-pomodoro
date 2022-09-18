@@ -1,12 +1,12 @@
 <script>
 
   // Import the functions you need from the SDKs you need
-  import { initializeApp } from "firebase/app";
-  import { getAnalytics } from "firebase/analytics";
+  import { initializeApp } from "@firebase/app";
+  import { getAnalytics } from "@firebase/analytics";
   // TODO Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
-  import { getFirestore, collection, addDoc, setDoc, getDoc, doc, updateDoc, arrayUnion, query, where, onSnapshot } from "firebase/firestore";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
+  import { getFirestore, collection, addDoc, setDoc, getDoc, doc, updateDoc, arrayUnion, query, where, onSnapshot } from "@firebase/firestore";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "@firebase/auth";
 
  
 
@@ -29,11 +29,13 @@
   const auth = getAuth();
 
   import Navbar from './lib/Navbar.svelte'
-
+  import Task from './lib/Task.svelte'
   import Timer from './lib/Timer.svelte'
-  let timer;
 
+  let timer;
+  let userTasks = [];
   let timeInSeconds;
+  let userLogged = false;
 
   window.onload = function(){
 
@@ -79,18 +81,18 @@
 
   onAuthStateChanged(auth, user =>{
     if(user){
-      document.getElementById("signedIn").hidden = false;
-      document.getElementById("signedOut").hidden = true;
-
       const userRef = doc(db, "user", user.uid);
 
       const unsub = onSnapshot(userRef, (doc) => {
-        console.log("Current tasks: ", doc.data().tasks);
+        doc.data().tasks.forEach(element => {
+          userTasks.push(element);
+          userTasks = userTasks;
+        });
       });
-
+      userLogged = true;
     }else{
-      document.getElementById("signedIn").hidden = true;
-      document.getElementById("signedOut").hidden = false;
+
+      userLogged = false;
     }
   })
 
@@ -127,22 +129,25 @@
 
   <div>
     <h1>Your Tasks</h1>
-    <div id="signedIn" hidden=true>
-      <div id="tasks">
+    {#if userLogged == true}
+      <div id="signedIn">
+        <div>
+          <input type="text" name="newTask" id="newTask" class="px-2 py-2 rounded-lg">
+          <button on:click={()=>addTask()}>Add Task</button>
+          <button on:click={()=>signOut(auth).then(()=>{})}>Sign out</button>
+        </div>
+        <div id="tasks">
+          {#each userTasks as task}
+            <Task task={task}/>
+          {/each}
+        </div>
       </div>
-      <div>
-        <input type="text" name="newTask" id="newTask" class="px-2 py-2 rounded-lg">
-        <button on:click={()=>addTask()}>Add Task</button>
-        <button on:click={()=>signOut(auth).then(()=>{
-          document.getElementById("signedIn").hidden = true;
-          document.getElementById("signedOut").hidden = false;
-        })}>Sign out</button>
+    {:else if userLogged == false}
+      <div id="signedOut">
+        <h2 class="mt-10">Sign in with google to get your tasks</h2>
+        <button class="mt-5" on:click={()=>signIn()}>Sign In</button>
       </div>
-    </div>
-    <div id="signedOut">
-      <h2 class="mt-10">Sign in with google to get your tasks</h2>
-      <button class="mt-5" on:click={()=>signIn()}>Sign In</button>
-    </div>
+    {/if}
   </div>
 
 </main>
