@@ -1,6 +1,7 @@
 <script>
     
     export let timeInSeconds = 300;
+    export let counting = false;
 
 
     let minutes;
@@ -25,10 +26,12 @@
             }
             
         },1000)
+        counting = true;
     }
 
     export function stop(){
         clearInterval(pomodoro);
+        counting = false;
     }
 
 </script>
