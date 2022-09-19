@@ -37,6 +37,8 @@
   let timeInSeconds;
   let userLogged = false;
 
+  let unsubscribe;
+
   window.onload = function(){
 
     if (Notification.permission !== "denied") {
@@ -56,9 +58,6 @@
       // The signed-in user info.
       const user = result.user;
 
-      const userRef = doc(db, "user", user.uid); //select a document with the user id
-      checkUser(userRef, user);
-
     }).catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
@@ -67,32 +66,24 @@
     });
   }
 
-  async function checkUser(userRef, userObj){
-    const docSnap = await getDoc(userRef);
-
-    if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data());
-    } else {
-      await setDoc(doc(db, "user", userObj.uid), {
-        username: userObj.displayName
-      });
-    }
-  }
-
   onAuthStateChanged(auth, user =>{
     if(user){
-      const userRef = doc(db, "user", user.uid);
 
-      const unsub = onSnapshot(userRef, (doc) => {
-        doc.data().tasks.forEach(element => {
-          userTasks.push(element);
-          userTasks = userTasks;
-        });
-      });
+      const q = query(collection(db, "tasks"), where("userId", "==", user.uid)); //make a query to select all documents of this user
+      unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const tasks = [];
+        querySnapshot.forEach( (doc) => {
+          tasks.push(doc.data());
+        })
+        userTasks = tasks;
+      })
+
       userLogged = true;
     }else{
 
       userLogged = false;
+
+      unsubscribe();
     }
   })
 
@@ -100,12 +91,16 @@
     let task = document.querySelector("#newTask").value;
 
     const user = auth.currentUser;
-    if(user !== null){
-      const userRef = doc(db, "user", user.uid);
-      await updateDoc(userRef, {
-          tasks: arrayUnion(task)
-      });
+
+    if (user !== null){
+      const ref = collection(db, "tasks");
+      await addDoc(ref, {
+        task: task,
+        userId: user.uid,
+        finished: false
+      })
     }
+
   }
 
 </script>
@@ -138,7 +133,7 @@
         </div>
         <div id="tasks">
           {#each userTasks as task}
-            <Task task={task}/>
+            <Task task={task.task} isFinished={task.finished}/>
           {/each}
         </div>
       </div>
