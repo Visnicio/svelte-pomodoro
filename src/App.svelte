@@ -155,7 +155,7 @@
     {#if userLogged == true}
       <div id="signedIn">
         <div>
-          <input type="text" name="newTask" id="newTask" class="px-2 py-2 rounded-lg" bind:value={task}>
+          <input type="text" name="newTask" id="newTask" class="px-2 py-2 rounded-lg" placeholder="Type your task here" bind:value={task}>
           <button on:click={()=>addTask()}>Add Task</button>
           <button on:click={()=>signOut(auth).then(()=>{})}>Sign out</button>
         </div>
