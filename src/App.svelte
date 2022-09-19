@@ -5,7 +5,7 @@
   import { getAnalytics } from "@firebase/analytics";
   // TODO Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
-  import { getFirestore, collection, addDoc, setDoc, getDoc, doc, updateDoc, arrayUnion, query, where, onSnapshot } from "@firebase/firestore";
+  import { getFirestore, collection, addDoc, setDoc, getDoc, doc, updateDoc, arrayUnion, query, where, onSnapshot, deleteDoc } from "@firebase/firestore";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "@firebase/auth";
 
  
@@ -31,10 +31,12 @@
   import Navbar from './lib/Navbar.svelte'
   import Task from './lib/Task.svelte'
   import Timer from './lib/Timer.svelte'
+  import { identity } from "svelte/internal";
 
   let timer;
   let userTasks = [];
   let timeInSeconds;
+  let counting;
   let userLogged = false;
   let task;
 
@@ -74,7 +76,12 @@
       unsubscribe = onSnapshot(q, (querySnapshot) => {
         const tasks = [];
         querySnapshot.forEach( (doc) => {
-          tasks.push(doc.data());
+          // tasks.push(doc.data());
+          tasks.push({
+            task: doc.data().task,
+            finished: doc.data().finished,
+            id: doc.id
+          });
         })
         userTasks = tasks;
       })
@@ -99,8 +106,27 @@
         userId: user.uid,
         finished: false
       })
+      task = "";
     }
 
+  }
+
+  async function changeTaskState(taskId, finished){
+    const taskRef = doc(db, "tasks", taskId);
+    // console.log(taskRef.id);
+    if(finished === false){
+      updateDoc(taskRef, {
+        finished: true
+      })
+    }else{
+      updateDoc(taskRef, {
+        finished: false
+      })
+    }
+  }
+
+  async function deleteTask(taskId){
+    await deleteDoc(doc(db, "tasks", taskId));
   }
 
 </script>
@@ -113,10 +139,12 @@
     <button on:click={()=>{timeInSeconds=900}}>15 Minutes</button>
   </div>
   
-  <Timer bind:this={timer} bind:timeInSeconds/>
+  <Timer bind:this={timer} bind:timeInSeconds bind:counting/>
   
   <div>
-    <button on:click={()=> timer.start() }>Start/Resume</button>
+    {#if counting == false}
+      <button on:click={()=> timer.start() }>Start/Resume</button>
+    {/if}
     <button on:click={()=> timer.stop() }>Stop</button>
   </div>
 
@@ -133,7 +161,11 @@
         </div>
         <div id="tasks">
           {#each userTasks as task}
-            <Task task={task.task} isFinished={task.finished}/>
+            <Task task={task.task} on:change={()=>{
+              changeTaskState(task.id, task.finished)
+            }} taskId={task.id} isFinished={task.finished} on:click={()=>{
+              deleteTask(task.id)
+            }}/>
           {/each}
         </div>
       </div>
